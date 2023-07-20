@@ -6,19 +6,30 @@ const app = express()
 const port = 3000
 
 sequelize.initDb()
+//middleware
+//app.use(express.json()) pour renvoyer tout en json
 app.use(express.json())
 app.use(morgan('dev'))
+
+const coworkingRouter = require('./routes/coworkingRoutes')
+const coworkingModels = require('./models/coworkingModelDefinition')
+app.use('/api/coworkings', coworkingRouter)
+
+
+app.listen(port, () => {
+    console.log(`Example app listening on port ${port}`)
+})
+
+
+
+
+
+
 
 
 // -----------GET---------------
 
 //app.get('/api/coworkings/:id', )
-
-
-
-const coworkingRouter = require('./routes/coworkingRoutes')
-const coworkingModels = require('./models/coworkingModels')
-app.use('/api/coworkings', coworkingRouter)
 
 // app.get('/api/coworkings', )
 
@@ -26,25 +37,15 @@ app.use('/api/coworkings', coworkingRouter)
 
 //app.post('/api/coworkings', )
 
-   
-
-
-
 
 // -----------PUT---------------
 //Modification des elements  d'un coworking
 //app.put('/api/coworkings/:id', )
 
-
 // -----------DELETE---------------
 
 //app.delete('/api/coworkings/:id', )
 
-
-
-app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`)
-})
 //http://localhost:3000/api/coworkings?criterium=capacity&orderBy=DESC
 
 //creer un nouveau endpoint pour afficher le tableau entier en json
