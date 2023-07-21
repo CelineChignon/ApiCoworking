@@ -16,6 +16,9 @@ sequelize.authenticate()
 const defineCoworkingModel = require('../models/coworkingModelDefinition')
 const CoworkingModel = defineCoworkingModel(sequelize, DataTypes)
 
+const defineUserModel = require('../models/userModelDefinition')
+const UserModel = defineUserModel(sequelize, DataTypes)
+
 const initDb = () => {
     sequelize.sync({ force: true })
         .then(() => {
@@ -28,9 +31,13 @@ const initDb = () => {
                     capacity: element.capacity,
                 });
             });
+            UserModel.create({
+                username: 'Jean Dupont',
+                password: 'mdp'
+            })
         })
 
 }
 module.exports = {
-    initDb, CoworkingModel
+    initDb, CoworkingModel, UserModel
 }

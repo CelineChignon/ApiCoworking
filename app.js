@@ -12,8 +12,10 @@ app.use(express.json())
 app.use(morgan('dev'))
 
 const coworkingRouter = require('./routes/coworkingRoutes')
-const coworkingModels = require('./models/coworkingModelDefinition')
+const userRouter = require('./routes/userRoutes')
+
 app.use('/api/coworkings', coworkingRouter)
+app.use('/api/users', userRouter)
 
 
 app.listen(port, () => {

@@ -1,5 +1,6 @@
-const coworkings = require('../db/mock-coworkings');
-const mockCoworkings = require('../db/mock-coworkings')
+const { UniqueConstraintError, ValidationError } = require('sequelize');
+//const coworkings = require('../db/mock-coworkings');
+//const mockCoworkings = require('../db/mock-coworkings')
 const { CoworkingModel } = require('../db/sequelize')
 
 
@@ -26,10 +27,10 @@ exports.findAllCoworkings = (req, res) => {
 
         })
         .then((result) => {
-            res.json({ message: `La liste des coworkings a bien été récuperée`, data: result })
+            res.status(200).json({ message: `La liste des coworkings a bien été récuperée`, data: result })
         })
         .catch((error) => {
-            res.json({ message: `Une erreur est survenue :${error}` })
+            res.status(500).json({ message: `Une erreur est survenue :${error}` })
         })
 
 
@@ -46,11 +47,14 @@ exports.createCoworking = (req, res) => {
             capacity: newCoworking.capacity,
         })
         .then((result) => {
-            res.json
+            res.status(201).json
                 ({ message: `Un nouveau coworking n°${result.id} a été créé.`, data: result })
         })
         .catch((error) => {
-            res.json({ message: `Une erreur est survenue :${error}` })
+            if (error instanceof UniqueConstraintError || error instanceof ValidationError) {
+                return res.status(404).json({ message: error.message })
+            }
+            res.status(500).json({ message: `Une erreur est survenue :${error}` })
         })
 }
 
@@ -60,14 +64,14 @@ exports.findCoworkingByPk = (req, res) => {
 
         .then((result) => {
             if (!result) {
-                res.json({ message: `L'élément ayant pour id ${req.params.id} n'existe pas` })
+                res.status(404).json({ message: `L'élément ayant pour id ${req.params.id} n'existe pas` })
             } else {
-                res.json({ message: `Le coworkings ${result.id} a bien été récuperée`, data: result })
+                res.status(200).json({ message: `Le coworkings ${result.id} a bien été récuperée`, data: result })
             }
 
         })
         .catch((error) => {
-            res.json({ message: `Une erreur est survenue :${error}` })
+            res.status(500).json({ message: `Une erreur est survenue :${error}` })
         })
 
     // let targetCoworking = mockCoworkings.find(el => el.id === parseInt(req.params.id))
@@ -86,16 +90,20 @@ exports.updateCoworking = (req, res) => {
         .findByPk(req.params.id)
         .then(result => {
             if (!result) {
-                return res.json({ message: `Aucun coworking trouvé` })
+                return res.status(404).json({ message: `Aucun coworking trouvé` })
             } else {
-                result
+                return result
                     .update(req.body)
                     .then(() => {
-                        res.json({ message: `Le coworking ${result.dataValues.id} a été modifié.`, data: result })
+                        res.status(200).json({ message: `Le coworking ${result.dataValues.id} a été modifié.`, data: result })
                     })
             }
         }).catch((error) => {
-            res.json({ message: `L'élément n'a pas pas été modifié Une erreur est survenue :${error}` })
+            if (error instanceof ValidationError) {
+                return res.status(404).json({ message: error.message })
+
+            }
+            res.status(500).json({ message: `L'élément n'a pas pas été modifié. Une erreur est survenue :${error}` })
         })
 
 
@@ -119,16 +127,16 @@ exports.deleteCoworking = (req, res) => {
         .findByPk(req.params.id)
         .then(result => {
             if (!result) {
-                return res.json({ message: `Aucun coworking trouvé` })
+                return res.status(404).json({ message: `Aucun coworking trouvé` })
             } else {
-                result
+                return result
                     .destroy()
                     .then(() => {
-                        res.json({ message: `Le coworking ${result.dataValues.id} a été supprimé.`, data: result })
+                        res.status(200).json({ message: `Le coworking ${result.dataValues.id} a été supprimé.`, data: result })
                     })
             }
         }).catch((error) => {
-            res.json({ message: `L'élément n'a pas pu être supprimé :${error}` })
+            res.status(500).json({ message: `L'élément n'a pas pu être supprimé :${error}` })
         })
 
     // CoworkingModel
