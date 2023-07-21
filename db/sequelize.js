@@ -1,6 +1,6 @@
 const { Sequelize, DataTypes } = require('sequelize');
 const mockCorworkings = require('./mock-coworkings')
-
+const bcrypt = require('bcrypt');
 
 const sequelize = new Sequelize('coworking', 'root', '', {
     host: 'localhost',
@@ -31,12 +31,15 @@ const initDb = () => {
                     capacity: element.capacity,
                 });
             });
-            UserModel.create({
-                username: 'Jean Dupont',
-                password: 'mdp'
-            })
-        })
+            bcrypt.hash(`mdp`, 10)
+                .then(hash => {
+                    UserModel.create({
+                        username: 'Jean ',
+                        password: hash
+                    })
+                })
 
+        })
 }
 module.exports = {
     initDb, CoworkingModel, UserModel
